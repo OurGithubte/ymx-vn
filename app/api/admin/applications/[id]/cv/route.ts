@@ -1,0 +1,3 @@
+import { NextResponse } from "next/server";
+import { requireStaff } from "@/lib/supabase/server";
+export async function GET(_:Request,{params}:{params:Promise<{id:string}>}){const staff=await requireStaff();if(!staff)return NextResponse.json({error:"Unauthorized"},{status:401});const {id}=await params;const {data:app}=await staff.client.from("applications").select("cv_path").eq("id",id).single();if(!app)return NextResponse.json({error:"Not found"},{status:404});const {data,error}=await staff.client.storage.from("candidate-cvs").createSignedUrl(app.cv_path,60);if(error||!data)return NextResponse.json({error:"Unable to open CV"},{status:400});return NextResponse.redirect(data.signedUrl)}

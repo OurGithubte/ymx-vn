@@ -1,0 +1,2 @@
+import type { MetadataRoute } from "next";
+export default function sitemap():MetadataRoute.Sitemap{const base=(process.env.NEXT_PUBLIC_SITE_URL||"https://ourgithubte.github.io/ymx-vn").replace(/\/$/,"");const locales=["vi","en","zh"],pages=["","about","products","equipment","quality-hse","careers","contact","privacy"];return locales.flatMap(lang=>pages.map(page=>({url:`${base}/${lang}${page?`/${page}`:""}`,lastModified:new Date(),changeFrequency:page==="careers"?"daily":"monthly",priority:page===""?1:page==="careers"?0.9:0.7})))}

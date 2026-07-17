@@ -1,5 +1,44 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { requireStaff } from "@/lib/supabase/server";
-const schema=z.object({titleVi:z.string().min(2),titleEn:z.string().min(2),titleZh:z.string().min(1),slug:z.string().regex(/^[a-z0-9-]+$/),department:z.string().min(2),location:z.string().min(2),summaryVi:z.string().min(10),summaryEn:z.string().min(10),summaryZh:z.string().min(5),responsibilitiesVi:z.string().min(3),responsibilitiesEn:z.string().min(3),responsibilitiesZh:z.string().min(1),requirementsVi:z.string().min(3),requirementsEn:z.string().min(3),requirementsZh:z.string().min(1),status:z.enum(["draft","published"])});
-export async function POST(request:Request){const staff=await requireStaff();if(!staff||!["admin","hr"].includes(staff.profile.role))return NextResponse.json({error:"Unauthorized"},{status:401});const parsed=schema.safeParse(await request.json());if(!parsed.success)return NextResponse.json({error:parsed.error.issues[0]?.message},{status:400});const x=parsed.data;const lines=(value:string)=>value.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);const row={id:crypto.randomUUID(),slug:x.slug,department:x.department,location:x.location,employment_type:"Full-time",title:{vi:x.titleVi,en:x.titleEn,zh:x.titleZh},summary:{vi:x.summaryVi,en:x.summaryEn,zh:x.summaryZh},responsibilities:{vi:lines(x.responsibilitiesVi),en:lines(x.responsibilitiesEn),zh:lines(x.responsibilitiesZh)},requirements:{vi:lines(x.requirementsVi),en:lines(x.requirementsEn),zh:lines(x.requirementsZh)},status:x.status,published_at:x.status==="published"?new Date().toISOString():null,created_by:staff.user.id};const {data,error}=await staff.client.from("jobs").insert(row).select().single();if(error)return NextResponse.json({error:error.message},{status:400});return NextResponse.json({job:data},{status:201})}
+import { jobInputSchema } from "@/lib/job-schema";
+import { mapJobRow } from "@/lib/jobs";
+
+export async function POST(request: Request) {
+  const staff = await requireStaff();
+  if (!staff || !["admin", "hr"].includes(staff.profile.role)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const parsed = jobInputSchema.safeParse(await request.json());
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message || "Dữ liệu không hợp lệ." }, { status: 400 });
+  const x = parsed.data;
+
+  if (x.status === "published" && !x.title.vi.trim()) {
+    return NextResponse.json({ error: "Cần nhập tên vị trí bằng Tiếng Việt trước khi đăng tuyển." }, { status: 400 });
+  }
+
+  const row = {
+    id: crypto.randomUUID(),
+    slug: x.slug,
+    department: x.department,
+    location: x.location,
+    employment_type: x.employmentType,
+    vacancies: x.vacancies,
+    level: x.level || null,
+    salary_text: x.salaryText || null,
+    application_deadline: x.applicationDeadline || null,
+    title: x.title,
+    summary: x.summary,
+    responsibilities: x.responsibilities,
+    requirements: x.requirements,
+    benefits: x.benefits,
+    status: x.status,
+    published_at: x.status === "published" ? new Date(x.publishedAt || Date.now()).toISOString() : null,
+    created_by: staff.user.id,
+  };
+
+  const { data, error } = await staff.client.from("jobs").insert(row).select().single();
+  if (error) {
+    const message = error.code === "23505" ? "Slug này đã được sử dụng, vui lòng chọn slug khác." : error.message;
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+  return NextResponse.json({ job: mapJobRow(data) }, { status: 201 });
+}

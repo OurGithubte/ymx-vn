@@ -85,16 +85,24 @@ def process():
             # Replace description
             content = re.sub(r'<meta name="description" content="[^"]*">', f'<meta name="description" content="{desc}">', content)
             
-            # Add favicon
+            # Add favicon and manifest
             depth = page.count('/')
-            favicon_path = "../" * (depth + 1) + "assets/favicon.svg"
-            favicon_tag = f'<link rel="icon" type="image/svg+xml" href="{favicon_path}">'
+            root_prefix = "../" * (depth + 1)
+            icon_tags = (
+                f'<link rel="icon" type="image/svg+xml" href="{root_prefix}assets/favicon.svg">\n'
+                f'<link rel="icon" type="image/png" sizes="32x32" href="{root_prefix}assets/favicon-32x32.png">\n'
+                f'<link rel="icon" type="image/png" sizes="16x16" href="{root_prefix}assets/favicon-16x16.png">\n'
+                f'<link rel="apple-touch-icon" sizes="180x180" href="{root_prefix}assets/apple-touch-icon.png">\n'
+                f'<link rel="manifest" href="{root_prefix}site.webmanifest">\n'
+                f'<meta name="theme-color" content="#0b2a4a">'
+            )
             
-            # If favicon already exists, replace it, else add it after stylesheet
-            if 'rel="icon"' in content:
-                content = re.sub(r'<link rel="icon".*?>', favicon_tag, content)
-            else:
-                content = re.sub(r'(<link rel="stylesheet".*?>)', r'\1\n' + favicon_tag, content)
+            # Remove old icon/manifest links first
+            content = re.sub(r'<link rel="(?:icon|apple-touch-icon|manifest)".*?>\n?', '', content)
+            content = re.sub(r'<meta name="theme-color".*?>\n?', '', content)
+            
+            # Add after stylesheet
+            content = re.sub(r'(<link rel="stylesheet".*?>)', r'\1\n' + icon_tags, content)
             
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(content)

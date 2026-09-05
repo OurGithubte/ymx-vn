@@ -804,7 +804,7 @@ def header(lang, active_page, depth=0, lang_target_path=None):
     return f"""<header>
   <div class="container nav-wrap">
     <a href="{nav_prefix}index.html" class="logo">
-      <div class="logo-box">YMX</div>
+      <img src="{root_prefix}assets/logo.png" alt="YMX" class="logo-img">
       <div class="logo-text">
         <strong>{d['site_name']}</strong>
         <span>{d['site_tag']}</span>
@@ -828,7 +828,7 @@ def footer(lang, depth=0):
   <div class="container">
     <div class="footer-inner">
       <div class="logo">
-        <div class="logo-box">YMX</div>
+        <img src="{root_prefix}assets/logo.png" alt="YMX" class="logo-img">
         <div class="logo-text">
           <strong style="color:#fff;">{d['site_name']} {d['site_tag']}</strong>
         </div>
@@ -852,6 +852,12 @@ def page_shell(lang, active_page, body, depth=0, lang_target_path=None):
 <title>{d['meta_title']}</title>
 <meta name="description" content="{d['meta_desc']}">
 <link rel="stylesheet" href="{root_prefix}assets/style.css">
+<link rel="icon" type="image/svg+xml" href="{root_prefix}assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="{root_prefix}assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="{root_prefix}assets/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="{root_prefix}assets/apple-touch-icon.png">
+<link rel="manifest" href="{root_prefix}site.webmanifest">
+<meta name="theme-color" content="#0b2a4a">
 </head>
 <body>
 {header(lang, active_page, depth, lang_target_path)}
@@ -1271,11 +1277,17 @@ landing_html = f"""<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YMX Vietnam Electronic Technology | Select Language / Chọn ngôn ngữ / 选择语言</title>
 <link rel="stylesheet" href="assets/style.css">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#0b2a4a">
 </head>
 <body>
 <div class="landing">
   <div class="landing-card">
-    <div class="logo-box" style="margin:0 auto 20px;">YMX</div>
+    <img src="assets/logo.png" alt="YMX" class="landing-logo">
     <h1>YMX Vietnam Electronic Technology</h1>
     <p>Chọn ngôn ngữ &nbsp;/&nbsp; Select language &nbsp;/&nbsp; 选择语言</p>
     <div class="lang-options">

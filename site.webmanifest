@@ -1,0 +1,27 @@
+{
+  "name": "YMX Vietnam Electronic Technology",
+  "short_name": "YMX Vietnam",
+  "description": "YMX Vietnam Electronic Technology - Chuyên gia cắt bế chính xác linh kiện điện tử",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b2a4a",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
